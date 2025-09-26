@@ -31,9 +31,9 @@ jobs:
           python3-pip \
           python3-setuptools \
           python3-wheel \
-          libncurses5 \
-          libncurses5-dev \
-          libtinfo5
+          libncurses6 \
+          libncurses-dev \
+          libtinfo6
 
     - name: Fix libtool macros
       run: |
