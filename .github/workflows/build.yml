@@ -40,7 +40,9 @@ jobs:
       - name: Build APK with Buildozer
         run: |
           export ANDROID_HOME=$HOME/android-sdk
-          export PATH=$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$PATH
+          export ANDROIDSDK=$ANDROID_HOME
+          export ANDROIDNDK=$ANDROID_HOME/ndk-bundle
+          export PATH=$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$ANDROID_HOME/build-tools/34.0.0:$PATH
           buildozer -v android release
 
 
