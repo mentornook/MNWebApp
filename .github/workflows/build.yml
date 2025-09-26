@@ -23,7 +23,9 @@ jobs:
       run: |
         sudo apt-get update
         sudo apt-get install -y \
-          libtool automake \
+          autoconf \
+          automake \
+          libtool \
           build-essential \
           git \
           zip unzip \
@@ -34,7 +36,16 @@ jobs:
           libncurses6 \
           libncurses-dev \
           libtinfo6 \
+          libtinfo-dev \
           curl
+          
+    - name: Fix libtool macros for autoreconf
+      run: |
+        mkdir -p m4
+        cp /usr/share/aclocal/libtool.m4 m4/ || true
+        cp /usr/share/aclocal/lt*.m4 m4/ || true
+        echo "ACLOCAL_PATH=/usr/share/aclocal:$ACLOCAL_PATH" >> $GITHUB_ENV
+
 
     - name: Install Android SDK + NDK
       run: |
@@ -55,12 +66,6 @@ jobs:
             "build-tools;31.0.0" \
             "ndk;25.2.9519653"
 
-    - name: Fix libtool macros
-      run: |
-        mkdir -p m4
-        cp /usr/share/aclocal/libtool.m4 m4/ || true
-        cp /usr/share/aclocal/lt*.m4 m4/ || true
-        
     - name: Fix sdkmanager path for Buildozer
       run: |
         mkdir -p $HOME/android-sdk/tools/bin
