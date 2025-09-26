@@ -1,4 +1,4 @@
-name: Build Android APK
+name: Build APK
 
 on:
   push:
@@ -11,77 +11,47 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+    - name: Checkout repo
+      uses: actions/checkout@v4
 
-      - name: Show system info
-        run: |
-          echo "OS release:"
-          cat /etc/os-release
-          echo "Kernel version:"
-          uname -a
-          echo "Available disk/memory:"
-          df -h
-          free -h
-          echo "Where is libtool macros?"
-          find /usr/share/aclocal -name "libtool*.m4" || true
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.10"
 
+    - name: Install system dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y \
+          libtool automake \
+          build-essential \
+          git \
+          zip unzip \
+          openjdk-17-jdk \
+          python3-pip \
+          python3-setuptools \
+          python3-wheel \
+          libncurses5 \
+          libncurses5-dev \
+          libtinfo5
 
-      - name: Set up JDK 17
-        uses: actions/setup-java@v4
-        with:
-          distribution: 'temurin'
-          java-version: '17'
+    - name: Fix libtool macros
+      run: |
+        mkdir -p m4
+        cp /usr/share/aclocal/libtool.m4 m4/ || true
+        cp /usr/share/aclocal/lt*.m4 m4/ || true
 
-      - name: Install dependencies
-        run: |
-          sudo apt update
-          sudo apt install -y python3-pip zip unzip wget
-          pip install buildozer cython
+    - name: Install Buildozer
+      run: |
+        pip install --upgrade pip
+        pip install buildozer cython
 
-      - name: Install Android SDK + Build-tools
-        run: |
-          wget https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip -O cmdline-tools.zip
-          mkdir -p $HOME/android-sdk/cmdline-tools
-          unzip -q cmdline-tools.zip -d $HOME/android-sdk/cmdline-tools
-          mv $HOME/android-sdk/cmdline-tools/cmdline-tools $HOME/android-sdk/cmdline-tools/latest
-          export ANDROID_HOME=$HOME/android-sdk
-          export PATH=$ANDROID_HOME/cmdline-tools/latest/bin:$PATH
-          yes | sdkmanager --licenses
-          sdkmanager "platform-tools" "platforms;android-34" "build-tools;34.0.0" "ndk;25.2.9519653"
+    - name: Build release APK
+      run: |
+        buildozer -v --log_level=2 android release
 
-      - name: Symlink SDK tools for Buildozer
-        run: |
-          mkdir -p $HOME/android-sdk/tools/bin
-          ln -s $HOME/android-sdk/cmdline-tools/latest/bin/* $HOME/android-sdk/tools/bin/
-
-      - name: Build APK with Buildozer
-        run: |
-          export ANDROID_HOME=$HOME/android-sdk
-          export ANDROIDSDK=$ANDROID_HOME
-          export ANDROIDNDK=$ANDROID_HOME/ndk/25.2.9519653
-          export ANDROIDAPI=34
-          export ANDROIDMINAPI=21
-          export PATH=$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$ANDROID_HOME/build-tools/34.0.0:$PATH
-          buildozer -v --log_level=2 android release
-
-
-      - name: Decode Keystore
-        run: echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > mnkey.jks
-
-      - name: Sign APK
-        run: |
-          jarsigner -verbose -sigalg SHA256withRSA -digestalg SHA-256 \
-            -keystore mnkey.jks \
-            -storepass ${{ secrets.KEYSTORE_PASSWORD }} \
-            -keypass ${{ secrets.KEY_PASSWORD }} \
-            bin/*.apk ${{ secrets.KEY_ALIAS }}
-
-      - name: Verify APK Signature
-        run: jarsigner -verify -verbose -certs bin/*.apk
-
-      - name: Upload Release APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: MNWebApp-release-apk
-          path: bin/*.apk
+    - name: Upload APK artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: release-apk
+        path: bin/*.apk
