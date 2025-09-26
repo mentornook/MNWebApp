@@ -50,7 +50,8 @@ jobs:
           export ANDROIDAPI=34
           export ANDROIDMINAPI=21
           export PATH=$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$ANDROID_HOME/build-tools/34.0.0:$PATH
-          buildozer -v android release
+          buildozer -v --log_level=2 android release
+
 
       - name: Decode Keystore
         run: echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > mnkey.jks
