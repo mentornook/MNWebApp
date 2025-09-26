@@ -60,6 +60,11 @@ jobs:
         mkdir -p m4
         cp /usr/share/aclocal/libtool.m4 m4/ || true
         cp /usr/share/aclocal/lt*.m4 m4/ || true
+        
+    - name: Fix sdkmanager path for Buildozer
+      run: |
+        mkdir -p $HOME/android-sdk/tools/bin
+        ln -s $HOME/android-sdk/cmdline-tools/latest/bin/sdkmanager $HOME/android-sdk/tools/bin/sdkmanager
 
     - name: Install Buildozer
       run: |
