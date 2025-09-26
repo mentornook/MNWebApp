@@ -39,12 +39,16 @@ jobs:
           libtinfo-dev \
           curl
           
-    - name: Fix libtool macros for autoreconf
+    - name: Ensure libtool macros are available
       run: |
-        mkdir -p m4
-        cp /usr/share/aclocal/libtool.m4 m4/ || true
-        cp /usr/share/aclocal/lt*.m4 m4/ || true
-        echo "ACLOCAL_PATH=/usr/share/aclocal:$ACLOCAL_PATH" >> $GITHUB_ENV
+        # Install missing packages
+        sudo apt-get install -y autopoint gettext
+        # Copy libtool macros to a safe place
+        mkdir -p $HOME/m4
+        cp /usr/share/aclocal/libtool.m4 $HOME/m4/ || true
+        cp /usr/share/aclocal/lt*.m4 $HOME/m4/ || true
+        # Export ACLOCAL_PATH so autoreconf can find them
+        echo "ACLOCAL_PATH=$HOME/m4:/usr/share/aclocal" >> $GITHUB_ENV
 
 
     - name: Install Android SDK + NDK
