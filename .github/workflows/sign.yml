@@ -11,7 +11,7 @@ jobs:
     - name: Download unsigned APK artifact
       uses: actions/download-artifact@v4
       with:
-        name: release-apk
+        name: mnwebapp-0.1-arm64-v8a_armeabi-v7a-release-unsigned
         path: unsigned
 
     - name: Decode Keystore
