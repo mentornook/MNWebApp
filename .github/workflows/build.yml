@@ -1,0 +1,50 @@
+name: Build APK (Signed)
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Install dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y python3-pip python3-setuptools git zip unzip openjdk-17-jdk \
+              libffi-dev libssl-dev libsqlite3-dev zlib1g-dev libjpeg-dev libfreetype6-dev \
+              pkg-config libgl1-mesa-dev libgles2-mesa-dev adb
+          pip3 install --upgrade pip Cython buildozer python-for-android kivy-garden
+          garden install webview
+
+      - name: Build Debug APK
+        run: |
+          buildozer -v android debug
+
+      - name: Upload Debug APK
+        uses: actions/upload-artifact@v3
+        with:
+          name: MNWebApp-debug-apk
+          path: bin/*.apk
+
+      - name: Decode Keystore
+        run: |
+          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > mnkey.jks
+
+      - name: Build Release APK
+        run: |
+          buildozer -v android release
+          jarsigner -verbose -sigalg SHA256withRSA -digestalg SHA-256 \
+            -keystore mnkey.jks -storepass ${{ secrets.KEYSTORE_PASSWORD }} \
+            bin/*.apk ${{ secrets.KEY_ALIAS }} -keypass ${{ secrets.KEY_PASSWORD }}
+
+      - name: Upload Release APK
+        uses: actions/upload-artifact@v3
+        with:
+          name: MNWebApp-release-apk
+          path: bin/*.apk
