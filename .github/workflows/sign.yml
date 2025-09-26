@@ -1,0 +1,39 @@
+name: Sign APK
+
+on:
+  workflow_dispatch:
+
+jobs:
+  sign:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Download unsigned APK artifact
+      uses: actions/download-artifact@v4
+      with:
+        name: release-apk
+        path: unsigned
+
+    - name: Decode Keystore
+      run: |
+        echo "$KEYSTORE_BASE64" | base64 -d > release-key.jks
+      env:
+        KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+
+    - name: Sign APK
+      run: |
+        APK_PATH=$(ls unsigned/*-release-unsigned.apk | head -n 1)
+        echo "Signing $APK_PATH"
+
+        jarsigner -verbose -sigalg SHA256withRSA -digestalg SHA-256 \
+          -keystore release-key.jks \
+          -storepass $KEYSTORE_PASSWORD \
+          -keypass $KEY_PASSWORD \
+          "$APK_PATH" $KEY_ALIAS
+
+        # Align APK (Play Store requirement)
+        sudo apt-get update && sudo apt-get install -y zipalign apksigner || true
+        if [ ! -f /usr/bin/zipalign ]; then
+          # fallback if package not found
+          curl -sSL https://dl.google.com/android/repository/build-tools_r31.0.0-linux.zip -o build-tools.zip
+         
