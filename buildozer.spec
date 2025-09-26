@@ -16,9 +16,10 @@ version = 0.1
 android.version_code = 1
 android.version_name = 0.1
 
-# Use system-installed SDK/NDK
-android.sdk_path = $HOME/android-sdk
-android.ndk_path = $HOME/android-sdk/ndk-bundle
+# Use system-installed SDK/NDK# Force SDK and NDK paths
+android.sdk_path = /home/runner/android-sdk
+android.ndk_path = /home/runner/android-sdk/ndk
+
 
 # The main script (dummy launcher, since we use webview)
 source.dir = .
