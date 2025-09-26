@@ -11,7 +11,7 @@ jobs:
 
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Install dependencies
         run: |
@@ -27,7 +27,7 @@ jobs:
           buildozer -v android debug
 
       - name: Upload Debug APK
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: MNWebApp-debug-apk
           path: bin/*.apk
@@ -44,7 +44,7 @@ jobs:
             bin/*.apk ${{ secrets.KEY_ALIAS }} -keypass ${{ secrets.KEY_PASSWORD }}
 
       - name: Upload Release APK
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: MNWebApp-release-apk
           path: bin/*.apk
