@@ -12,13 +12,11 @@ package.domain = org.mnwebapp
 # Your app version (change this when updating)
 version = 0.1
 
-# Android versioning
 android.version_code = 1
 android.version_name = 0.1
-
-# Use system-installed SDK/NDK# Force SDK and NDK paths
 android.sdk_path = /home/runner/android-sdk
-android.ndk_path = /home/runner/android-sdk/ndk
+android.ndk_path = /home/runner/android-sdk/ndk/25.2.9519653
+
 
 
 # The main script (dummy launcher, since we use webview)
