@@ -1,26 +1,46 @@
 [app]
-title = MN WebApp
-package.name = mnwebapp
-package.domain = org.example
-source.dir = .
-source.include_exts = py,png,jpg,kv,atlas
 
-# Icon (replace icon.png with your logo)
-icon.filename = %(source.dir)s/icon.png
+# ⚡ Change this to your app name
+title = Mentor Nook
+
+# ⚡ Package name (used in APK name)
+package.name = mnwebapp
+
+# ⚡ Reverse-domain style package (must be unique if uploading to Google Play)
+package.domain = org.mnwebapp
+
+# Your app version (change this when updating)
+version = 0.1
+
+# Android versioning
+android.version_code = 1
+android.version_name = 0.1
+
+# The main script (dummy launcher, since we use webview)
+source.dir = .
+source.include_exts = py,png,jpg,kv,atlas,html,css,js
 
 # Requirements
-requirements = python3,kivy,kivy_garden.webview
+requirements = python3,kivy,kivy_garden.xcamera,plyer
+
+# Orientation (landscape, portrait or all)
 orientation = portrait
 
-# Permissions for WebView
-android.permissions = INTERNET,ACCESS_NETWORK_STATE
+# App icon (⚡ replace with your icon file)
+icon.filename = %(source.dir)s/data/icon.png
 
-# Target Android API (Google Play requires at least 33 now)
-android.api = 34
-android.minapi = 21
+# Starting screen (splash)
+presplash.filename = %(source.dir)s/data/splash.png
 
-# Build release format
+# Package format
 android.release_artifact = apk
+
+# Permissions
+android.permissions = INTERNET
+
+# (Optional) allow WebView debug
+android.debug = True
+
 
 [buildozer]
 log_level = 2
