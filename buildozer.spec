@@ -16,6 +16,10 @@ version = 0.1
 android.version_code = 1
 android.version_name = 0.1
 
+# Use system-installed SDK/NDK
+android.sdk_path = $HOME/android-sdk
+android.ndk_path = $HOME/android-sdk/ndk-bundle
+
 # The main script (dummy launcher, since we use webview)
 source.dir = .
 source.include_exts = py,png,jpg,kv,atlas,html,css,js
