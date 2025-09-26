@@ -20,7 +20,7 @@ android.api = 34
 android.minapi = 21
 
 # Build release format
-android.release_artifact = aab
+android.release_artifact = apk
 
 [buildozer]
 log_level = 2
