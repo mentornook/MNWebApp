@@ -33,35 +33,45 @@ jobs:
           python3-wheel \
           libncurses6 \
           libncurses-dev \
-          libtinfo6
+          libtinfo6 \
+          curl
+
+    - name: Install Android SDK + NDK
+      run: |
+        mkdir -p $HOME/android-sdk/cmdline-tools
+        cd $HOME/android-sdk/cmdline-tools
+        curl -sSL https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip -o sdk-tools.zip
+        unzip -q sdk-tools.zip
+        rm sdk-tools.zip
+        mv cmdline-tools latest
+
+        export ANDROID_HOME=$HOME/android-sdk
+        export PATH=$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$PATH
+
+        yes | sdkmanager --licenses
+        yes | sdkmanager \
+            "platform-tools" \
+            "platforms;android-31" \
+            "build-tools;31.0.0" \
+            "ndk;25.2.9519653"
 
     - name: Fix libtool macros
       run: |
         mkdir -p m4
         cp /usr/share/aclocal/libtool.m4 m4/ || true
         cp /usr/share/aclocal/lt*.m4 m4/ || true
-        
-    - name: Install Android SDK Build Tools
-      run: |
-           mkdir -p $HOME/android-sdk/cmdline-tools
-            cd $HOME/android-sdk/cmdline-tools
-                curl -sSL https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip -o sdk-tools.zip
-                unzip -q sdk-tools.zip
-                rm sdk-tools.zip
-                mv cmdline-tools latest
-                yes | $HOME/android-sdk/cmdline-tools/latest/bin/sdkmanager --licenses
-                yes | $HOME/android-sdk/cmdline-tools/latest/bin/sdkmanager \
-                "platform-tools" \
-                "platforms;android-31" \
-                "build-tools;31.0.0" \
-                "ndk;25.2.9519653"      
-  
+
     - name: Install Buildozer
       run: |
         pip install --upgrade pip
         pip install buildozer cython
 
     - name: Build release APK
+      env:
+        ANDROIDSDK: $HOME/android-sdk
+        ANDROIDNDK: $HOME/android-sdk/ndk/25.2.9519653
+        ANDROIDAPI: "31"
+        ANDROIDMINAPI: "21"
       run: |
         buildozer -v --log_level=2 android release
 
